@@ -6,6 +6,8 @@ use App\Like;
 use App\Post;
 use App\Tag;
 use Illuminate\Http\Request;
+use Auth;
+use Gate;
 
 class PostController extends Controller
 {
@@ -78,6 +80,10 @@ class PostController extends Controller
 //        $post->tags()->attach($request->input('tags') === null ? [] : $request->input('tags'));
         $post->tags()->sync($request->input('tags') === null ? [] : $request->input('tags'));
         return redirect()->route('admin.index')->with('info', 'Post edited, new Title is: ' . $request->input('title'));
+
+        if(Gate::denies('update-post', $post)){
+            return redirect()->back();
+        }
     }
 
     public function getAdminDelete($id)
@@ -88,4 +94,5 @@ class PostController extends Controller
         $post->delete();
         return redirect()->route('admin.index')->with('info', 'Post deleted!');
     }
+
 }
